@@ -1,0 +1,22 @@
+{
+  "name": "react-native-backdrop",
+  "version": "1.0.3",
+  "description": "Backdrop component built with Material Guidelines for React Native",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tmmgn/react-native-backdrop.git"
+  },
+  "keywords": [
+    "react-native",
+    "backdrop"
+  ],
+  "bugs": {
+    "url": "https://github.com/tmmgn/react-native-backdrop/issues"
+  },
+  "peerDependencies": {
+    "react": ">=16.9.0",
+    "react-native": ">=0.60.5"
+  },
+  "author": "tmmgn",
+  "license": "MIT"
+}
