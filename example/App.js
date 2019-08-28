@@ -1,6 +1,6 @@
 import React, {Fragment, useState} from 'react';
 import {TouchableOpacity, Text, View, StatusBar} from 'react-native';
-import Backdrop from './src/components/Backdrop';
+import {Backdrop} from 'react-native-backdrop';
 
 const App = () => {
   const [visible, setVisible] = useState(false);
@@ -26,33 +26,20 @@ const App = () => {
         </TouchableOpacity>
       </View>
 
-      <Backdrop
-        visible={visible}
-        handleClose={handleClose}
-        swipeConfig={{
-          velocityThreshold: 0.3,
-          directionalOffsetThreshold: 80,
-        }}
-        overlayColor="rgba(0,0,0,0.32)"
-        backdropStyle={{
-          backgroundColor: '#fff',
-        }}
-        animationConfig={{
-          speed: 10,
-          bounciness: 12,
-        }}
-        hideClosePlate>
+      <Backdrop visible={visible} handleClose={handleClose}>
         <View>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
-          <Text>Backdrop</Text>
+          <Text>Some backdrop Content</Text>
+          <View
+            style={{
+              marginTop: 12,
+              backgroundColor: '#bdbdbd',
+              padding: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 12,
+            }}>
+            <Text>Content inside view</Text>
+          </View>
         </View>
       </Backdrop>
     </Fragment>

@@ -35,8 +35,9 @@ class Backdrop extends Component {
   static defaultProps = {
     onClose: () => {},
     backdropStyle: {},
+    animationConfig: {},
     swipeConfig: {},
-    content: "",
+    overlayColor: "rgba(0,0,0,0.32)",
     paddingBottom: 40,
     hideClosePlate: false
   };
