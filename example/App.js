@@ -6,13 +6,15 @@ import {
   StatusBar,
   StyleSheet,
 } from 'react-native';
-import {Backdrop} from 'react-native-backdrop';
+import Backdrop from './Backdrop';
 
 const App = () => {
   const [visible, setVisible] = useState(false);
   const handleClose = () => {
     setVisible(false);
   };
+
+  console.log(visible);
 
   return (
     <Fragment>
@@ -29,7 +31,11 @@ const App = () => {
         </TouchableOpacity>
       </View>
 
-      <Backdrop visible={visible} handleClose={handleClose}>
+      <Backdrop
+        visible={visible}
+        handleClose={handleClose}
+        handleOpen={() => setVisible(true)}
+        closedHeight={100}>
         <View>
           <Text style={styles.textCenter}>Some backdrop Content</Text>
           <View style={styles.cardStyle}>
