@@ -76,7 +76,7 @@ const App = () => {
 | **`swipeConfig`**     | Configures Swipe Gesture to close backdrop                   | `{velocityThreshold: 0.3, directionalOffsetThreshold: 80}`                                   |
 | **`backdropStyle`**   | Style object for backdrop styling                            | `{}`                                                                                         |
 | **`overlayColor`**    | Color of backdrop overlay                                    | `rgba(0, 0, 0, 0.32)`                                                                        |
-| **`hedaer`**          | Display custom header in backdrop                            | `() => (<View style={styles.closePlateContainer}><View style={styles.closePlate} /></View>)` |
+| **`header`**          | Display custom header in backdrop                            | `() => (<View style={styles.closePlateContainer}><View style={styles.closePlate} /></View>)` |
 | **`closedHeight`**    | Height of closed backdrop that will be visible and touchable | `0`                                                                                          |
 
 velocityThreshold - Velocity that has to be breached in order for swipe to be triggered (vx and vy properties of gestureState)
