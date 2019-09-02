@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   StyleSheet,
   Animated,
@@ -6,27 +6,27 @@ import {
   SafeAreaView,
   TouchableOpacity,
   PanResponder,
-  Dimensions
-} from "react-native";
+  Dimensions,
+} from 'react-native';
 
-const { height } = Dimensions.get("window");
+const {height} = Dimensions.get('window');
 
 const swipeConfigDefault = {
   velocityThreshold: 0.3,
-  directionalOffsetThreshold: 50
+  directionalOffsetThreshold: 50,
 };
 
 const animationConfigDefault = {
   duration: 50,
   speed: 20,
-  bounciness: 5
+  bounciness: 5,
 };
 
 const isValidSwipe = (
   velocity,
   velocityThreshold,
   directionalOffset,
-  directionalOffsetThreshold
+  directionalOffsetThreshold,
 ) =>
   Math.abs(velocity) > velocityThreshold &&
   Math.abs(directionalOffset) < directionalOffsetThreshold;
@@ -37,7 +37,7 @@ class Backdrop extends Component {
     backdropStyle: {},
     animationConfig: {},
     swipeConfig: {},
-    overlayColor: "rgba(0,0,0,0.32)",
+    overlayColor: 'rgba(0,0,0,0.32)',
     paddingBottom: 40,
     header: () => (
       <View style={styles.closePlateContainer}>
@@ -45,18 +45,18 @@ class Backdrop extends Component {
       </View>
     ),
     loading: true,
-    closedHeight: 0
+    closedHeight: 0,
   };
 
   state = {
-    backdropHeight: 0
+    backdropHeight: 0,
   };
 
-  swipeConfig = { ...swipeConfigDefault, ...this.props.swipeConfig };
+  swipeConfig = {...swipeConfigDefault, ...this.props.swipeConfig};
 
   animationConfig = {
     ...animationConfigDefault,
-    ...this.props.animationConfig
+    ...this.props.animationConfig,
   };
 
   _transitionY = new Animated.Value(this.props.closedHeight);
@@ -76,22 +76,22 @@ class Backdrop extends Component {
 
   onLayout = event => {
     this._transitionY.setValue(
-      event.nativeEvent.layout.height - this.props.closedHeight
+      event.nativeEvent.layout.height - this.props.closedHeight,
     );
     this.setState(
       {
         backdropHeight: event.nativeEvent.layout.height,
-        loading: false
+        loading: false,
       },
       () => {
         this.handleAnimationInit();
-      }
+      },
     );
   };
 
   handleAnimationInit = () => {
     const spring = Animated.spring;
-    const { backdropHeight } = this.state;
+    const {backdropHeight} = this.state;
 
     if (this.anim) {
       this.anim = null;
@@ -100,17 +100,17 @@ class Backdrop extends Component {
     const startAnimation = spring(this._transitionY, {
       toValue: 40,
       useNativeDriver: true,
-      ...this.animationConfig
+      ...this.animationConfig,
     });
 
     const closeAnimation = spring(this._transitionY, {
       toValue: backdropHeight - this.props.closedHeight,
       useNativeDriver: true,
-      ...this.animationConfig
+      ...this.animationConfig,
     });
 
     this.setState({
-      closeAnimation: closeAnimation
+      closeAnimation: closeAnimation,
     });
 
     this.anim = startAnimation;
@@ -126,8 +126,8 @@ class Backdrop extends Component {
       }
     },
     onPanResponderMove: async (evt, gestureState) => {
-      const { paddingBottom, closedHeight, visible } = this.props;
-      const { backdropHeight } = this.state;
+      const {paddingBottom, closedHeight, visible} = this.props;
+      const {backdropHeight} = this.state;
       const startingPosition = backdropHeight - closedHeight;
       const offset = visible
         ? backdropHeight - paddingBottom - (height - gestureState.y0)
@@ -150,7 +150,7 @@ class Backdrop extends Component {
       }
     },
     onPanResponderRelease: (evt, gestureState) => {
-      const { paddingBottom, handleOpen, visible } = this.props;
+      const {paddingBottom, handleOpen, visible} = this.props;
       if (this._isValidVerticalSwipe(gestureState)) {
         if (gestureState.vy > 0) {
           this._handleClose();
@@ -158,8 +158,8 @@ class Backdrop extends Component {
           if (visible && this.anim) {
             this.anim.start();
           } else {
+            handleOpen();
             if (this.anim) {
-              handleOpen();
               this.anim.start();
             } else {
               this.handleAnimationInit();
@@ -168,8 +168,8 @@ class Backdrop extends Component {
           }
         }
       } else {
-        const { vy, dy } = gestureState;
-        const { backdropHeight } = this.state;
+        const {vy, dy} = gestureState;
+        const {backdropHeight} = this.state;
         const halfHeight = dy > (backdropHeight - paddingBottom * 2) / 2;
         if (!visible) {
           handleOpen();
@@ -177,7 +177,7 @@ class Backdrop extends Component {
             Animated.spring(this._transitionY, {
               toValue: 40,
               useNativeDriver: true,
-              ...this.animationConfig
+              ...this.animationConfig,
             }).start();
           } else {
             this._handleClose();
@@ -189,7 +189,7 @@ class Backdrop extends Component {
             Animated.spring(this._transitionY, {
               toValue: 40,
               useNativeDriver: true,
-              ...this.animationConfig
+              ...this.animationConfig,
             }).start();
           }
         }
@@ -197,17 +197,17 @@ class Backdrop extends Component {
     },
     onPanResponderTerminate: (evt, gestureState) => {
       this._handleClose();
-    }
+    },
   });
 
   _isValidVerticalSwipe(gestureState) {
-    const { vy, dx } = gestureState;
-    const { velocityThreshold, directionalOffsetThreshold } = this.swipeConfig;
+    const {vy, dx} = gestureState;
+    const {velocityThreshold, directionalOffsetThreshold} = this.swipeConfig;
     return isValidSwipe(vy, velocityThreshold, dx, directionalOffsetThreshold);
   }
 
   _handleClose = () => {
-    const { onClose, handleClose } = this.props;
+    const {onClose, handleClose} = this.props;
 
     if (handleClose) {
       this.props.handleClose();
@@ -217,7 +217,7 @@ class Backdrop extends Component {
       this.state.closeAnimation.start(() => {
         this.anim = null;
         this._transitionY.setValue(
-          this.state.backdropHeight - this.props.closedHeight
+          this.state.backdropHeight - this.props.closedHeight,
         );
         if (onClose) {
           onClose();
@@ -236,14 +236,14 @@ class Backdrop extends Component {
       children,
       overlayColor,
       closedHeight,
-      header
+      header,
     } = this.props;
-    const { backdropHeight } = this.state;
+    const {backdropHeight} = this.state;
 
     let opacityAnimation = backdropHeight
       ? this._transitionY.interpolate({
           inputRange: [40, backdropHeight - closedHeight],
-          outputRange: [1, 0]
+          outputRange: [1, 0],
         })
       : 0;
 
@@ -254,11 +254,10 @@ class Backdrop extends Component {
             styles.overlayStyle,
             {
               backgroundColor: overlayColor,
-              opacity: opacityAnimation
-            }
+              opacity: opacityAnimation,
+            },
           ]}
-          pointerEvents={visible ? "auto" : "none"}
-        >
+          pointerEvents={visible ? 'auto' : 'none'}>
           <TouchableOpacity
             style={styles.overlayTouchable}
             onPress={this._handleClose}
@@ -274,22 +273,20 @@ class Backdrop extends Component {
               opacity: backdropHeight ? 1 : 0, // Hide before layout prevents blink
               transform: [
                 {
-                  translateY: this._transitionY
-                }
-              ]
-            }
-          ]}
-        >
+                  translateY: this._transitionY,
+                },
+              ],
+            },
+          ]}>
           <View
-            pointerEvents={backdropHeight ? "auto" : "none"}
+            pointerEvents={backdropHeight ? 'auto' : 'none'}
             style={[
               styles.container,
-              { paddingBottom: this.props.paddingBottom + 12 },
-              backdropStyle
+              {paddingBottom: this.props.paddingBottom + 12},
+              backdropStyle,
             ]}
             onLayout={this.onLayout}
-            {...this._panResponder.panHandlers}
-          >
+            {...this._panResponder.panHandlers}>
             {!!header && header()}
             <View>{children}</View>
           </View>
@@ -301,58 +298,58 @@ class Backdrop extends Component {
 
 const styles = StyleSheet.create({
   wrapper: {
-    position: "absolute",
+    position: 'absolute',
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
     zIndex: 100,
     elevation: 10,
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
     flex: 1,
-    paddingTop: 40
+    paddingTop: 40,
   },
   container: {
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1
+      height: 1,
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-    backgroundColor: "#ffffff",
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
   },
   overlayTouchable: {
-    flex: 1
+    flex: 1,
   },
   contentContainer: {
     marginTop: 48,
     flex: 1,
-    justifyContent: "flex-end"
+    justifyContent: 'flex-end',
   },
   overlayStyle: {
-    position: "absolute",
+    position: 'absolute',
     left: 0,
     right: 0,
     top: 0,
-    bottom: 0
+    bottom: 0,
   },
   closePlateContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 32
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 32,
   },
   closePlate: {
     width: 40,
     height: 5,
     borderRadius: 5,
-    backgroundColor: "#bdbdbd"
-  }
+    backgroundColor: '#bdbdbd',
+  },
 });
 
 export default Backdrop;

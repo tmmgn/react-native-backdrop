@@ -6,7 +6,7 @@ import {
   StatusBar,
   StyleSheet,
 } from 'react-native';
-import {Backdrop} from 'react-native-backdrop';
+import Backdrop from 'react-native-backdrop';
 
 const App = () => {
   const [visible, setVisible] = useState(false);
@@ -29,7 +29,11 @@ const App = () => {
         </TouchableOpacity>
       </View>
 
-      <Backdrop visible={visible} handleClose={handleClose}>
+      <Backdrop
+        visible={visible}
+        handleClose={handleClose}
+        handleOpen={() => setVisible(true)}
+        closedHeight={32}>
         <View>
           <Text style={styles.textCenter}>Some backdrop Content</Text>
           <View style={styles.cardStyle}>
