@@ -2,7 +2,10 @@
 
 React Native Backdrop component built with material guidelines
 
+Example with no closed height
 <img src="https://user-images.githubusercontent.com/11463030/64114120-dbeb5e00-cd94-11e9-8584-aaffcd055421.gif" width="300" alt="Without closedHeight">
+
+Example with closed height
 <img src="https://user-images.githubusercontent.com/11463030/64114122-dd1c8b00-cd94-11e9-84df-a66fe3213a7e.gif" width="300" alt="With closedHeight">
 
 ## Installation
