@@ -52,8 +52,7 @@ const App = () => {
         overlayColor="rgba(0,0,0,0.32)"
         backdropStyle={{
           backgroundColor: '#fff',
-        }}
-        hideClosePlate>
+        }}>
         <View>
           <Text>Backdrop Content</Text>
         </View>
@@ -62,21 +61,23 @@ const App = () => {
   }
 }
 
+
 ```
 
 ### Backdrop Properties
 
-| Prop                  | Description                                               | Default                                                    |
-| --------------------- | --------------------------------------------------------- | ---------------------------------------------------------- |
-| **`children`**        | Content of backdrop (required)                            |                                                            |
-| **`visible`**         | Whether the backdrop is visible (required, boolean)       | `false`                                                    |
-| **`handleClose`**     | Function to close backdrop (required, function)           | `() => {}`                                                 |
-| **`onClose`**         | Callback that is called when the user closes the backdrop | `() => {}`                                                 |
-| **`animationConfig`** | Configures Open and Close Animation speed and bounciness  | `{speed: 14, bounciness: 4}`                               |
-| **`swipeConfig`**     | Configures Swipe Gesture to close backdrop                | `{velocityThreshold: 0.3, directionalOffsetThreshold: 80}` |
-| **`backdropStyle`**   | Style object for backdrop styling                         | `{}`                                                       |
-| **`overlayColor`**    | Color of backdrop overlay                                 | `rgba(0, 0, 0, 0.32)`                                      |
-| **`hideClosePlate`**  | Hides the close plate in header of backdrop               | `false`                                                    |
+| Prop                  | Description                                                  | Default                                                                                      |
+| --------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| **`children`**        | Content of backdrop (required)                               |                                                                                              |
+| **`visible`**         | Whether the backdrop is visible (required, boolean)          | `false`                                                                                      |
+| **`handleClose`**     | Function to close backdrop (required, function)              | `() => {}`                                                                                   |
+| **`onClose`**         | Callback that is called when the user closes the backdrop    | `() => {}`                                                                                   |
+| **`animationConfig`** | Configures Open and Close Animation speed and bounciness     | `{speed: 14, bounciness: 4}`                                                                 |
+| **`swipeConfig`**     | Configures Swipe Gesture to close backdrop                   | `{velocityThreshold: 0.3, directionalOffsetThreshold: 80}`                                   |
+| **`backdropStyle`**   | Style object for backdrop styling                            | `{}`                                                                                         |
+| **`overlayColor`**    | Color of backdrop overlay                                    | `rgba(0, 0, 0, 0.32)`                                                                        |
+| **`hedaer`**          | Display custom header in backdrop                            | `() => (<View style={styles.closePlateContainer}><View style={styles.closePlate} /></View>)` |
+| **`closedHeight`**    | Height of closed backdrop that will be visible and touchable | `0`                                                                                          |
 
 velocityThreshold - Velocity that has to be breached in order for swipe to be triggered (vx and vy properties of gestureState)
 directionalOffsetThreshold - Absolute offset that shouldn't be breached for swipe to be triggered (dy for horizontal swipe, dx for vertical swipe)

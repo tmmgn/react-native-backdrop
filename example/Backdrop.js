@@ -18,8 +18,8 @@ const swipeConfigDefault = {
 
 const animationConfigDefault = {
   duration: 50,
-  speed: 14,
-  bounciness: 4,
+  speed: 20,
+  bounciness: 5,
 };
 
 const isValidSwipe = (
@@ -39,7 +39,11 @@ class Backdrop extends Component {
     swipeConfig: {},
     overlayColor: 'rgba(0,0,0,0.32)',
     paddingBottom: 40,
-    hideClosePlate: false,
+    header: () => (
+      <View style={styles.closePlateContainer}>
+        <View style={styles.closePlate} />
+      </View>
+    ),
     loading: true,
     closedHeight: 0,
   };
@@ -56,7 +60,6 @@ class Backdrop extends Component {
   };
 
   _transitionY = new Animated.Value(this.props.closedHeight);
-  _currentPosition = this.props.closedHeight;
 
   componentDidUpdate(prevProps) {
     if (prevProps.visible !== this.props.visible && this.props.visible) {
@@ -81,9 +84,7 @@ class Backdrop extends Component {
         loading: false,
       },
       () => {
-        if (this.props.visible) {
-          this.handleAnimationInit();
-        }
+        this.handleAnimationInit();
       },
     );
   };
@@ -102,8 +103,6 @@ class Backdrop extends Component {
       ...this.animationConfig,
     });
 
-    this._transitionY.addListener(({value}) => (this._currentPosition = value));
-
     const closeAnimation = spring(this._transitionY, {
       toValue: backdropHeight - this.props.closedHeight,
       useNativeDriver: true,
@@ -115,7 +114,9 @@ class Backdrop extends Component {
     });
 
     this.anim = startAnimation;
-    this.anim.start();
+    if (this.props.visible) {
+      this.anim.start();
+    }
   };
 
   _panResponder = PanResponder.create({
@@ -128,20 +129,22 @@ class Backdrop extends Component {
       const {paddingBottom, closedHeight, visible} = this.props;
       const {backdropHeight} = this.state;
       const startingPosition = backdropHeight - closedHeight;
-      let currentPosition = this._transitionY.__getValue();
-      let isMaxHeight = this._currentPosition < paddingBottom;
-      console.log(gestureState.moveY, backdropHeight);
-      // height - backdropHeight + paddingBottom < gestureState.moveY;
-      const isMinHeight = currentPosition > startingPosition;
-
+      const offset = visible
+        ? backdropHeight - paddingBottom - (height - gestureState.y0)
+        : closedHeight - (height - gestureState.y0); // Get the touch offset from top of backdrop
       if (
         !visible &&
         gestureState.dy < 0 &&
-        gestureState.moveY >= startingPosition
+        height - gestureState.moveY + offset <=
+          startingPosition + closedHeight - paddingBottom
       ) {
         const newPosition = startingPosition + gestureState.dy;
         this._transitionY.setValue(newPosition);
-      } else if (visible && gestureState.dy > 0) {
+      } else if (
+        visible &&
+        gestureState.dy > 0 &&
+        gestureState.moveY - offset < height - closedHeight
+      ) {
         const newPosition = gestureState.dy + paddingBottom;
         this._transitionY.setValue(newPosition);
       }
@@ -151,11 +154,17 @@ class Backdrop extends Component {
       if (this._isValidVerticalSwipe(gestureState)) {
         if (gestureState.vy > 0) {
           this._handleClose();
-        } else if (gestureState.vy <= 0) {
-          if (visible) {
+        } else {
+          if (visible && this.anim) {
             this.anim.start();
           } else {
             handleOpen();
+            if (this.anim) {
+              this.anim.start();
+            } else {
+              this.handleAnimationInit();
+              this.anim.start();
+            }
           }
         }
       } else {
@@ -225,9 +234,9 @@ class Backdrop extends Component {
       backdropStyle,
       visible,
       children,
-      hideClosePlate,
       overlayColor,
       closedHeight,
+      header,
     } = this.props;
     const {backdropHeight} = this.state;
 
@@ -278,11 +287,7 @@ class Backdrop extends Component {
             ]}
             onLayout={this.onLayout}
             {...this._panResponder.panHandlers}>
-            {!hideClosePlate && (
-              <View style={styles.closePlateContainer}>
-                <View style={styles.closePlate} />
-              </View>
-            )}
+            {!!header && header()}
             <View>{children}</View>
           </View>
         </Animated.View>
@@ -337,8 +342,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    flex: 1,
+    height: 32,
   },
   closePlate: {
     width: 40,

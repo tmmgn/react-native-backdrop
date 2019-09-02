@@ -6,15 +6,13 @@ import {
   StatusBar,
   StyleSheet,
 } from 'react-native';
-import Backdrop from './Backdrop';
+import Backdrop from 'react-native-backdrop';
 
 const App = () => {
   const [visible, setVisible] = useState(false);
   const handleClose = () => {
     setVisible(false);
   };
-
-  console.log(visible);
 
   return (
     <Fragment>
@@ -35,7 +33,7 @@ const App = () => {
         visible={visible}
         handleClose={handleClose}
         handleOpen={() => setVisible(true)}
-        closedHeight={100}>
+        closedHeight={32}>
         <View>
           <Text style={styles.textCenter}>Some backdrop Content</Text>
           <View style={styles.cardStyle}>
