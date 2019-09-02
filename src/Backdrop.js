@@ -162,8 +162,8 @@ class Backdrop extends Component {
               handleOpen();
               this.anim.start();
             } else {
+              handleOpen();
               this.handleAnimationInit();
-              this.anim.start();
             }
           }
         }

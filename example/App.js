@@ -6,7 +6,7 @@ import {
   StatusBar,
   StyleSheet,
 } from 'react-native';
-import Backdrop from 'react-native-backdrop';
+import {Backdrop} from 'react-native-backdrop';
 
 const App = () => {
   const [visible, setVisible] = useState(false);
