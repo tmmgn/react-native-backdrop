@@ -2,8 +2,8 @@
 
 React Native Backdrop component built with material guidelines
 
-![Backdrop closed](https://user-images.githubusercontent.com/11463030/63857337-3018cb80-c9ac-11e9-96c9-c047e0937b09.png)
-![Backdrop opened](https://user-images.githubusercontent.com/11463030/63857338-3149f880-c9ac-11e9-98f2-311b477a80da.png)
+![Without closedHeight](https://user-images.githubusercontent.com/11463030/64114120-dbeb5e00-cd94-11e9-8584-aaffcd055421.gif)
+![With closedHeight](https://user-images.githubusercontent.com/11463030/64114122-dd1c8b00-cd94-11e9-84df-a66fe3213a7e.gif)
 
 ## Installation
 
