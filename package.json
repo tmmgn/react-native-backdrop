@@ -18,5 +18,6 @@
     "react-native": ">=0.60.5"
   },
   "author": "tmmgn",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": { "registry": "https://npm.pkg.github.com/@tmmgn" }
 }
