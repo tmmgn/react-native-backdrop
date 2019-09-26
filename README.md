@@ -16,6 +16,11 @@ import { Backdrop } from "react-native-backdrop";
 
 const App = () => {
   const [visible, setVisible] = useState(false);
+  
+  const handleOpen = () => {
+    setVisible(true);
+  };
+  
   const handleClose = () => {
     setVisible(false);
   };
@@ -39,6 +44,7 @@ const App = () => {
       </View>
       <Backdrop
         visible={visible}
+        handleOpen={handleOpen}
         handleClose={handleClose}
         onClose={() => {}}
         swipeConfig={{
@@ -69,7 +75,8 @@ const App = () => {
 | Prop                  | Description                                                  | Default                                                                                      |
 | --------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
 | **`children`**        | Content of backdrop (required)                               |                                                                                              |
-| **`visible`**         | Whether the backdrop is visible (required, boolean)          | `false`                                                                                      |
+| **`visible`**         | Whether the backdrop is visible (required, boolean)          | `false`     
+| **`handleOpen`**     | Function to open backdrop (required, function)              | `() => {}`       |
 | **`handleClose`**     | Function to close backdrop (required, function)              | `() => {}`                                                                                   |
 | **`onClose`**         | Callback that is called when the user closes the backdrop    | `() => {}`                                                                                   |
 | **`animationConfig`** | Configures Open and Close Animation speed and bounciness     | `{speed: 14, bounciness: 4}`                                                                 |
