@@ -209,10 +209,6 @@ class Backdrop extends Component {
   _handleClose = () => {
     const { onClose, handleClose } = this.props;
 
-    if (handleClose) {
-      this.props.handleClose();
-    }
-
     if (this.state.closeAnimation) {
       this.state.closeAnimation.start(() => {
         this.anim = null;

@@ -1,6 +1,6 @@
 {
   "name": "react-native-backdrop",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Backdrop component built with Material Guidelines for React Native",
   "repository": {
     "type": "git",
@@ -18,6 +18,5 @@
     "react-native": ">=0.60.5"
   },
   "author": "tmmgn",
-  "license": "MIT",
-  "publishConfig": { "registry": "https://npm.pkg.github.com/@tmmgn" }
+  "license": "MIT"
 }
