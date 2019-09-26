@@ -222,10 +222,16 @@ class Backdrop extends Component {
         if (onClose) {
           onClose();
         }
+        if (handleClose) {
+          handleClose();
+        }
       });
     } else if (this.anim) {
       this.anim.stop();
       this.anim = null;
+      if (handleClose) {
+        handleClose();
+      }
     }
   };
 
@@ -271,7 +277,7 @@ class Backdrop extends Component {
           style={[
             styles.contentContainer,
             {
-              opacity: backdropHeight ? 1 : 0, // Hide before layout prevents blink
+              opacity: backdropHeight && visible ? 1 : 0, // Hide before layout prevents blink
               transform: [
                 {
                   translateY: this._transitionY
@@ -281,7 +287,7 @@ class Backdrop extends Component {
           ]}
         >
           <View
-            pointerEvents={backdropHeight ? "auto" : "none"}
+            pointerEvents={backdropHeight && visible ? 'auto' : 'none'}
             style={[
               styles.container,
               { paddingBottom: this.props.paddingBottom + 12 },
