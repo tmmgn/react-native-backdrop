@@ -62,8 +62,13 @@ class Backdrop extends Component {
   _transitionY = new Animated.Value(this.props.closedHeight);
 
   componentDidUpdate(prevProps) {
-    if (prevProps.visible !== this.props.visible && this.props.visible) {
-      this.handleAnimationInit();
+   	if (prevProps.visible !== this.props.visible && this.props.visible) {
+      if (this.anim) {
+        this.anim.stop();
+        this.handleAnimationInit();
+      } else {
+        this.handleAnimationInit();
+      }
     }
   }
 
