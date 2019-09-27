@@ -80,9 +80,9 @@ class Backdrop extends Component {
   }
 
   onLayout = event => {
-    this._transitionY.setValue(
-      event.nativeEvent.layout.height - this.props.closedHeight
-    );
+    if (!this.state.backdropHeight) {
+      this._transitionY.setValue(event.nativeEvent.layout.height - this.props.closedHeight);
+    }
     this.setState(
       {
         backdropHeight: event.nativeEvent.layout.height,
