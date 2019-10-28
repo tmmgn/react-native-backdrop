@@ -69,6 +69,16 @@ class Backdrop extends Component {
       } else {
         this.handleAnimationInit();
       }
+    } else if (prevProps.visible !== this.props.visible && !this.props.visible) {
+      if (this.state.closeAnimation && this.anim) {
+        this.state.closeAnimation.start(() => {
+          this.anim = null;
+          this._transitionY.setValue(this.state.backdropHeight - this.props.closedHeight);
+          if (this.props.onClose) {
+            this.props.onClose();
+          }
+        });
+      }
     }
   }
 
