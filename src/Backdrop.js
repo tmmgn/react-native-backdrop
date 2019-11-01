@@ -257,7 +257,7 @@ class Backdrop extends Component {
     } = this.props;
     const { backdropHeight } = this.state;
 
-    let opacityAnimation = backdropHeight
+    let opacityAnimation = backdropHeight && visible
       ? this._transitionY.interpolate({
           inputRange: [40, backdropHeight - closedHeight],
           outputRange: [1, 0]
