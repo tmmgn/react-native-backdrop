@@ -44,7 +44,6 @@ class Backdrop extends Component {
         <View style={styles.closePlate} />
       </View>
     ),
-    loading: true,
     closedHeight: 0
   };
 
@@ -95,8 +94,7 @@ class Backdrop extends Component {
     }
     this.setState(
       {
-        backdropHeight: event.nativeEvent.layout.height,
-        loading: false
+        backdropHeight: event.nativeEvent.layout.height
       },
       () => {
         this.handleAnimationInit();
