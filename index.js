@@ -1,3 +1,3 @@
-import Backdrop from "./src/Backdrop";
+import Backdrop from "./src/backdrop";
 
 export { Backdrop };

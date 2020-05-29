@@ -1,25 +1,32 @@
-import React, { Component } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import {
-  StyleSheet,
   Animated,
   View,
   SafeAreaView,
   TouchableOpacity,
   PanResponder,
-  Dimensions
+  Dimensions,
 } from "react-native";
+import styles from "./styles";
 
 const { height } = Dimensions.get("window");
 
 const swipeConfigDefault = {
   velocityThreshold: 0.3,
-  directionalOffsetThreshold: 50
+  directionalOffsetThreshold: 80,
 };
 
 const animationConfigDefault = {
+  useNativeDriver: true,
   duration: 50,
-  speed: 20,
-  bounciness: 5
+  speed: 14,
+  bounciness: 4,
 };
 
 const isValidSwipe = (
@@ -31,343 +38,205 @@ const isValidSwipe = (
   Math.abs(velocity) > velocityThreshold &&
   Math.abs(directionalOffset) < directionalOffsetThreshold;
 
-class Backdrop extends Component {
-  static defaultProps = {
-    onClose: () => {},
-    backdropStyle: {},
-    animationConfig: {},
-    swipeConfig: {},
-    overlayColor: "rgba(0,0,0,0.32)",
-    paddingBottom: 40,
-    header: () => (
-      <View style={styles.closePlateContainer}>
-        <View style={styles.closePlate} />
-      </View>
-    ),
-    closedHeight: 0
-  };
+const Backdrop = ({
+  visible = false,
+  overlayColor = "rgba(0,0,0,0.3)",
+  children,
+  handleOpen = () => {},
+  handleClose = () => {},
+  closedHeight = 0,
+  header = null,
+  backdropStyle = {},
+  containerStyle = { backgroundColor: "#fff" },
+  animationConfig = {},
+  swipeConfig = {},
+  beforeOpen = () => {},
+  afterOpen = () => {},
+  beforeClose = () => {},
+  afterClose = () => {},
+}) => {
+  const [contentHeight, setHeight] = useState(0);
+  const transitionY = useRef(new Animated.Value(height)).current;
 
-  state = {
-    backdropHeight: 0
-  };
+  useEffect(() => {
+    visible ? animationStart() : animationEnd();
+  }, [visible, animationStart, animationEnd]);
 
-  swipeConfig = { ...swipeConfigDefault, ...this.props.swipeConfig };
+  const swipeConfigConcated = { ...swipeConfigDefault, ...swipeConfig };
 
-  animationConfig = {
+  const animationConfigConcated = {
     ...animationConfigDefault,
-    ...this.props.animationConfig
+    ...animationConfig,
   };
 
-  _transitionY = new Animated.Value(this.props.closedHeight);
+  const animationStart = useCallback(() => {
+    Animated.spring(transitionY, {
+      toValue: 0,
+      ...animationConfigConcated,
+    }).start(() => afterOpen());
+  }, [transitionY, afterOpen, animationConfigConcated]);
 
-  componentDidUpdate(prevProps) {
-   	if (prevProps.visible !== this.props.visible && this.props.visible) {
-      if (this.anim) {
-        this.anim.stop();
-        this.handleAnimationInit();
-      } else {
-        this.handleAnimationInit();
-      }
-    } else if (prevProps.visible !== this.props.visible && !this.props.visible) {
-      if (this.state.closeAnimation && this.anim) {
-        this.state.closeAnimation.start(() => {
-          this.anim = null;
-          this._transitionY.setValue(this.state.backdropHeight - this.props.closedHeight);
-          if (this.props.onClose) {
-            this.props.onClose();
-          }
-        });
-      }
-    }
-  }
+  const animationEnd = useCallback(() => {
+    Animated.spring(transitionY, {
+      toValue: contentHeight - closedHeight,
+      ...animationConfigConcated,
+    }).start(() => afterClose());
+  }, [
+    transitionY,
+    contentHeight,
+    closedHeight,
+    afterClose,
+    animationConfigConcated,
+  ]);
 
-  componentWillUnmount() {
-    if (this.anim) {
-      this.anim.stop();
-      this.anim = null;
-    }
-  }
-
-  onLayout = event => {
-    if (!this.state.backdropHeight) {
-      this._transitionY.setValue(event.nativeEvent.layout.height - this.props.closedHeight);
-    }
-    this.setState(
-      {
-        backdropHeight: event.nativeEvent.layout.height
-      },
-      () => {
-        this.handleAnimationInit();
-      }
-    );
-  };
-
-  handleAnimationInit = () => {
-    const spring = Animated.spring;
-    const { backdropHeight } = this.state;
-
-    if (this.anim) {
-      this.anim = null;
-    }
-
-    const startAnimation = spring(this._transitionY, {
-      toValue: 40,
-      useNativeDriver: true,
-      ...this.animationConfig
-    });
-
-    const closeAnimation = spring(this._transitionY, {
-      toValue: backdropHeight - this.props.closedHeight,
-      useNativeDriver: true,
-      ...this.animationConfig
-    });
-
-    this.setState({
-      closeAnimation: closeAnimation
-    });
-
-    this.anim = startAnimation;
-    if (this.props.visible) {
-      this.anim.start();
-    }
-  };
-
-  _panResponder = PanResponder.create({
-    onMoveShouldSetPanResponder: (evt, gestureState) => {
-      if (gestureState.dy > 0 || gestureState.dy < 0) {
-        return true;
+  const onLayout = useCallback(
+    (event) => {
+      if (!contentHeight) {
+        transitionY.setValue(event.nativeEvent.layout.height - closedHeight);
+        setHeight(event.nativeEvent.layout.height);
       }
     },
-    onPanResponderMove: async (evt, gestureState) => {
-      const { paddingBottom, closedHeight, visible } = this.props;
-      const { backdropHeight } = this.state;
-      const startingPosition = backdropHeight - closedHeight;
-      const offset = visible
-        ? backdropHeight - paddingBottom - (height - gestureState.y0)
-        : closedHeight - (height - gestureState.y0); // Get the touch offset from top of backdrop
-      if (
-        !visible &&
-        gestureState.dy < 0 &&
-        height - gestureState.moveY + offset <=
-          startingPosition + closedHeight - paddingBottom
-      ) {
-        const newPosition = startingPosition + gestureState.dy;
-        this._transitionY.setValue(newPosition);
-      } else if (
-        visible &&
-        gestureState.dy > 0 &&
-        gestureState.moveY - offset < height - closedHeight
-      ) {
-        const newPosition = gestureState.dy + paddingBottom;
-        this._transitionY.setValue(newPosition);
+    [contentHeight, closedHeight, transitionY]
+  );
+
+  const _panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (evt) => true,
+    onPanResponderMove: (e, gestureState) => {
+      if (visible) {
+        Animated.event([null, { dy: transitionY }], { useNativeDriver: false })(
+          e,
+          gestureState
+        );
+      } else {
+        transitionY.setValue(gestureState.dy + contentHeight - closedHeight);
       }
     },
     onPanResponderRelease: (evt, gestureState) => {
-      const { paddingBottom, handleOpen, visible } = this.props;
-      if (this._isValidVerticalSwipe(gestureState)) {
-        if (gestureState.vy > 0) {
-          this._handleClose();
+      if (_isValidVerticalSwipe(gestureState)) {
+        if (gestureState.dy > 0) {
+          _handleClose();
         } else {
-          if (visible && this.anim) {
-            this.anim.start();
-          } else {
-            if (this.anim) {
-              handleOpen();
-              this.anim.start();
-            } else {
-              handleOpen();
-              this.handleAnimationInit();
-            }
-          }
+          _handleOpen();
         }
       } else {
         const { vy, dy } = gestureState;
-        const { backdropHeight } = this.state;
-        const halfHeight = dy > (backdropHeight - paddingBottom * 2) / 2;
-        if (!visible) {
-          handleOpen();
-          if (vy <= 0) {
-            Animated.spring(this._transitionY, {
-              toValue: 40,
-              useNativeDriver: true,
-              ...this.animationConfig
-            }).start();
-          } else {
-            this._handleClose();
-          }
+        const halfHeight = dy > contentHeight / 2;
+        if (vy > 0 && halfHeight) {
+          _handleClose();
         } else {
-          if (vy > 0 && halfHeight) {
-            this._handleClose();
-          } else {
-            Animated.spring(this._transitionY, {
-              toValue: 40,
-              useNativeDriver: true,
-              ...this.animationConfig
-            }).start();
-          }
+          _handleOpen();
         }
       }
     },
-    onPanResponderTerminate: (evt, gestureState) => {
-      this._handleClose();
-    }
   });
 
-  _isValidVerticalSwipe(gestureState) {
-    const { vy, dx } = gestureState;
-    const { velocityThreshold, directionalOffsetThreshold } = this.swipeConfig;
-    return isValidSwipe(vy, velocityThreshold, dx, directionalOffsetThreshold);
-  }
+  const _isValidVerticalSwipe = useCallback(
+    (gestureState) => {
+      const { vy, dx } = gestureState;
+      const {
+        velocityThreshold,
+        directionalOffsetThreshold,
+      } = swipeConfigConcated;
+      return isValidSwipe(
+        vy,
+        velocityThreshold,
+        dx,
+        directionalOffsetThreshold
+      );
+    },
+    [swipeConfigConcated]
+  );
 
-  _handleClose = () => {
-    const { onClose, handleClose } = this.props;
+  const _handleOpen = useCallback(() => {
+    beforeOpen();
+    animationStart();
+    handleOpen();
+  }, [beforeOpen, handleOpen, animationStart]);
 
-    if (this.state.closeAnimation) {
-      this.state.closeAnimation.start(() => {
-        this.anim = null;
-        this._transitionY.setValue(
-          this.state.backdropHeight - this.props.closedHeight
-        );
-        if (onClose) {
-          onClose();
-        }
-        if (handleClose) {
-          handleClose();
-        }
-      });
-    } else if (this.anim) {
-      this.anim.stop();
-      this.anim = null;
-      if (handleClose) {
-        handleClose();
-      }
-    }
+  const _handleClose = () => {
+    beforeClose();
+    handleClose();
   };
 
-  render() {
-    const {
-      backdropStyle,
-      visible,
-      children,
-      overlayColor,
-      closedHeight,
-      header
-    } = this.props;
-    const { backdropHeight } = this.state;
+  // const _handleScroll = useCallback(
+  //   (evt) => {
+  //     if (evt.nativeEvent.contentOffset.y > 0 && !scrolled) {
+  //       setScrolled(true);
+  //     } else if (evt.nativeEvent.contentOffset.y === 0 && scrolled) {
+  //       setScrolled(false);
+  //     }
+  //   },
+  //   [scrolled],
+  // );
 
-    let opacityAnimation = backdropHeight && visible
-      ? this._transitionY.interpolate({
-          inputRange: [40, backdropHeight - closedHeight],
-          outputRange: [1, 0]
-        })
-      : 0;
+  const clampedTransition = useMemo(
+    () =>
+      transitionY.interpolate({
+        inputRange: [0, contentHeight ? contentHeight - closedHeight : 1],
+        outputRange: [
+          contentHeight > height ? contentHeight - height + closedHeight : 0,
+          contentHeight ? contentHeight - closedHeight : 1,
+        ],
+        extrapolate: "clamp",
+      }),
+    [closedHeight, contentHeight, transitionY]
+  );
 
-    return (
-      <SafeAreaView pointerEvents="box-none" style={styles.wrapper}>
-        <Animated.View
-          style={[
-            styles.overlayStyle,
-            {
-              backgroundColor: overlayColor,
-              opacity: opacityAnimation
-            }
-          ]}
-          pointerEvents={visible ? "auto" : "none"}
+  const clampedOpacity = useMemo(
+    () =>
+      transitionY.interpolate({
+        inputRange: [0, contentHeight ? contentHeight - closedHeight : 1],
+        outputRange: [1, 0],
+        extrapolate: "clamp",
+      }),
+    [closedHeight, contentHeight, transitionY]
+  );
+
+  return (
+    <SafeAreaView pointerEvents="box-none" style={styles.wrapper}>
+      <Animated.View
+        style={[
+          styles.overlayStyle,
+          backdropStyle,
+          {
+            backgroundColor: overlayColor,
+            opacity: clampedOpacity,
+          },
+        ]}
+        pointerEvents={visible ? "auto" : "none"}
+      >
+        <TouchableOpacity
+          style={styles.overlayTouchable}
+          onPress={_handleClose}
+        />
+      </Animated.View>
+
+      <Animated.View
+        pointerEvents="box-none"
+        accessibilityLiveRegion="polite"
+        style={[
+          styles.contentContainer,
+          {
+            transform: [
+              {
+                translateY: clampedTransition,
+              },
+            ],
+            opacity: contentHeight ? 1 : 0,
+          },
+        ]}
+      >
+        <View
+          style={containerStyle}
+          onLayout={onLayout}
+          {..._panResponder.panHandlers}
         >
-          <TouchableOpacity
-            style={styles.overlayTouchable}
-            onPress={this._handleClose}
-          />
-        </Animated.View>
-
-        <Animated.View
-          pointerEvents="box-none"
-          accessibilityLiveRegion="polite"
-          style={[
-            styles.contentContainer,
-            {
-              opacity: backdropHeight && visible ? 1 : 0, // Hide before layout prevents blink
-              transform: [
-                {
-                  translateY: this._transitionY
-                }
-              ]
-            }
-          ]}
-        >
-          <View
-            pointerEvents={backdropHeight && visible ? 'auto' : 'none'}
-            style={[
-              styles.container,
-              { paddingBottom: this.props.paddingBottom + 12 },
-              backdropStyle
-            ]}
-            onLayout={this.onLayout}
-            {...this._panResponder.panHandlers}
-          >
-            {!!header && header()}
-            <View>{children}</View>
-          </View>
-        </Animated.View>
-      </SafeAreaView>
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  wrapper: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    zIndex: 100,
-    elevation: 10,
-    justifyContent: "flex-end",
-    flex: 1,
-    paddingTop: 40
-  },
-  container: {
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    backgroundColor: "#ffffff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 16
-  },
-  overlayTouchable: {
-    flex: 1
-  },
-  contentContainer: {
-    marginTop: 48,
-    flex: 1,
-    justifyContent: "flex-end"
-  },
-  overlayStyle: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0
-  },
-  closePlateContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 32
-  },
-  closePlate: {
-    width: 40,
-    height: 5,
-    borderRadius: 5,
-    backgroundColor: "#bdbdbd"
-  }
-});
+          {header}
+          {children}
+        </View>
+      </Animated.View>
+    </SafeAreaView>
+  );
+};
 
 export default Backdrop;
