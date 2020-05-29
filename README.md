@@ -2,8 +2,9 @@
 
 React Native Backdrop component built with material guidelines
 
-<img src="https://user-images.githubusercontent.com/11463030/64115482-726d4e80-cd98-11e9-8f7d-f2d1f64f6daf.gif" width="300" alt="Without closedHeight">
-<img src="https://user-images.githubusercontent.com/11463030/64115483-74cfa880-cd98-11e9-9413-525568983873.gif" width="300" alt="With closedHeight">
+| <img src="https://user-images.githubusercontent.com/11463030/64115482-726d4e80-cd98-11e9-8f7d-f2d1f64f6daf.gif" width="300" alt="Without closedHeight"> | <img src="https://user-images.githubusercontent.com/11463030/64115483-74cfa880-cd98-11e9-9413-525568983873.gif" width="300" alt="With closedHeight"> |
+
+
 
 ## Installation
 
@@ -76,10 +77,14 @@ const App = () => {
 | **`visible`**         | Whether the backdrop is visible (required, boolean)          | `false`     
 | **`handleOpen`**     | Function to open backdrop (required, function)              | `() => {}`       |
 | **`handleClose`**     | Function to close backdrop (required, function)              | `() => {}`                                                                                   |
-| **`onClose`**         | Callback that is called when the user closes the backdrop    | `() => {}`                                                                                   |
+| **`beforeClose`**         | Callback that is called before close animation    | `() => {}`                                                                                   |
+| **`afterClose`**         | Callback that is called after close animation    | `() => {}`                                                                                   |
+| **`beforeOpen`**         | Callback that is called before open animation    | `() => {}`                                                                                   |
+| **`afterOpen`**         | Callback that is called after open animation    | `() => {}`                                                                                   |
 | **`animationConfig`** | Configures Open and Close Animation speed and bounciness     | `{speed: 14, bounciness: 4}`                                                                 |
 | **`swipeConfig`**     | Configures Swipe Gesture to close backdrop                   | `{velocityThreshold: 0.3, directionalOffsetThreshold: 80}`                                   |
 | **`backdropStyle`**   | Style object for backdrop styling                            | `{}`                                                                                         |
+| **`containerStyle`**   | Style object for container styling                            | `{ backgroundColor: "#fff" }`                                                                                         |
 | **`overlayColor`**    | Color of backdrop overlay                                    | `rgba(0, 0, 0, 0.32)`                                                                        |
 | **`header`**          | Display custom header in backdrop                            | `() => (<View style={styles.closePlateContainer}><View style={styles.closePlate} /></View>)` |
 | **`closedHeight`**    | Height of closed backdrop that will be visible and touchable | `0`                                                                                          |
