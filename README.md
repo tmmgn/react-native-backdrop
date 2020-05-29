@@ -1,6 +1,6 @@
 # React Native Backdrop
 
-React Native Backdrop component built with material guidelines
+React Native Backdrop component built with material guidelines for android and ios
 
 | <img src="https://user-images.githubusercontent.com/11463030/64115482-726d4e80-cd98-11e9-8f7d-f2d1f64f6daf.gif" width="300" alt="Without closedHeight"> | <img src="https://user-images.githubusercontent.com/11463030/64115483-74cfa880-cd98-11e9-9413-525568983873.gif" width="300" alt="With closedHeight"> |
 
