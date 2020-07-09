@@ -88,6 +88,7 @@ const App = () => {
 | **`overlayColor`**    | Color of backdrop overlay                                    | `rgba(0, 0, 0, 0.32)`                                                                        |
 | **`header`**          | Display custom header in backdrop                            | `() => (<View style={styles.closePlateContainer}><View style={styles.closePlate} /></View>)` |
 | **`closedHeight`**    | Height of closed backdrop that will be visible and touchable | `0`                                                                                          |
+| **`closeOnBackButton`**    | Close backdrop on back button press on android | `false`                                                                                          |
 
 velocityThreshold - Velocity that has to be breached in order for swipe to be triggered (vx and vy properties of gestureState)
 directionalOffsetThreshold - Absolute offset that shouldn't be breached for swipe to be triggered (dy for horizontal swipe, dx for vertical swipe)
