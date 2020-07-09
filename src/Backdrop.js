@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useMemo,
-} from "react";
+import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
 import {
   Animated,
   View,
@@ -12,10 +6,11 @@ import {
   TouchableOpacity,
   PanResponder,
   Dimensions,
-} from "react-native";
-import styles from "./styles";
+  BackHandler,
+} from 'react-native';
+import styles from './styles';
 
-const { height } = Dimensions.get("window");
+const {height} = Dimensions.get('window');
 
 const swipeConfigDefault = {
   velocityThreshold: 0.3,
@@ -33,27 +28,28 @@ const isValidSwipe = (
   velocity,
   velocityThreshold,
   directionalOffset,
-  directionalOffsetThreshold
+  directionalOffsetThreshold,
 ) =>
   Math.abs(velocity) > velocityThreshold &&
   Math.abs(directionalOffset) < directionalOffsetThreshold;
 
 const Backdrop = ({
   visible = false,
-  overlayColor = "rgba(0,0,0,0.3)",
+  overlayColor = 'rgba(0,0,0,0.3)',
   children,
   handleOpen = () => {},
   handleClose = () => {},
   closedHeight = 0,
   header = null,
   backdropStyle = {},
-  containerStyle = { backgroundColor: "#fff" },
+  containerStyle = {backgroundColor: '#fff'},
   animationConfig = {},
   swipeConfig = {},
   beforeOpen = () => {},
   afterOpen = () => {},
   beforeClose = () => {},
   afterClose = () => {},
+  closeOnBackButton = false,
 }) => {
   const [contentHeight, setHeight] = useState(0);
   const transitionY = useRef(new Animated.Value(height)).current;
@@ -62,7 +58,17 @@ const Backdrop = ({
     visible ? animationStart() : animationEnd();
   }, [visible, animationStart, animationEnd]);
 
-  const swipeConfigConcated = { ...swipeConfigDefault, ...swipeConfig };
+  useEffect(() => {
+    closeOnBackButton &&
+      BackHandler.addEventListener('hardwareBackPress', onBackButtonPress);
+
+    return () => {
+      closeOnBackButton &&
+        BackHandler.removeEventListener('hardwareBackPress', onBackButtonPress);
+    };
+  }, [closeOnBackButton, onBackButtonPress]);
+
+  const swipeConfigConcated = {...swipeConfigDefault, ...swipeConfig};
 
   const animationConfigConcated = {
     ...animationConfigDefault,
@@ -96,16 +102,21 @@ const Backdrop = ({
         setHeight(event.nativeEvent.layout.height);
       }
     },
-    [contentHeight, closedHeight, transitionY]
+    [contentHeight, closedHeight, transitionY],
   );
+
+  const onBackButtonPress = useCallback(() => {
+    _handleClose();
+    return true;
+  }, [_handleClose]);
 
   const _panResponder = PanResponder.create({
     onStartShouldSetPanResponder: (evt) => true,
     onPanResponderMove: (e, gestureState) => {
       if (visible) {
-        Animated.event([null, { dy: transitionY }], { useNativeDriver: false })(
+        Animated.event([null, {dy: transitionY}], {useNativeDriver: false})(
           e,
-          gestureState
+          gestureState,
         );
       } else {
         transitionY.setValue(gestureState.dy + contentHeight - closedHeight);
@@ -119,7 +130,7 @@ const Backdrop = ({
           _handleOpen();
         }
       } else {
-        const { vy, dy } = gestureState;
+        const {vy, dy} = gestureState;
         const halfHeight = dy > contentHeight / 2;
         if (vy > 0 && halfHeight) {
           _handleClose();
@@ -132,7 +143,7 @@ const Backdrop = ({
 
   const _isValidVerticalSwipe = useCallback(
     (gestureState) => {
-      const { vy, dx } = gestureState;
+      const {vy, dx} = gestureState;
       const {
         velocityThreshold,
         directionalOffsetThreshold,
@@ -141,10 +152,10 @@ const Backdrop = ({
         vy,
         velocityThreshold,
         dx,
-        directionalOffsetThreshold
+        directionalOffsetThreshold,
       );
     },
-    [swipeConfigConcated]
+    [swipeConfigConcated],
   );
 
   const _handleOpen = useCallback(() => {
@@ -153,21 +164,10 @@ const Backdrop = ({
     handleOpen();
   }, [beforeOpen, handleOpen, animationStart]);
 
-  const _handleClose = () => {
+  const _handleClose = useCallback(() => {
     beforeClose();
     handleClose();
-  };
-
-  // const _handleScroll = useCallback(
-  //   (evt) => {
-  //     if (evt.nativeEvent.contentOffset.y > 0 && !scrolled) {
-  //       setScrolled(true);
-  //     } else if (evt.nativeEvent.contentOffset.y === 0 && scrolled) {
-  //       setScrolled(false);
-  //     }
-  //   },
-  //   [scrolled],
-  // );
+  }, [beforeClose, handleClose]);
 
   const clampedTransition = useMemo(
     () =>
@@ -177,9 +177,9 @@ const Backdrop = ({
           contentHeight > height ? contentHeight - height + closedHeight : 0,
           contentHeight ? contentHeight - closedHeight : 1,
         ],
-        extrapolate: "clamp",
+        extrapolate: 'clamp',
       }),
-    [closedHeight, contentHeight, transitionY]
+    [closedHeight, contentHeight, transitionY],
   );
 
   const clampedOpacity = useMemo(
@@ -187,9 +187,9 @@ const Backdrop = ({
       transitionY.interpolate({
         inputRange: [0, contentHeight ? contentHeight - closedHeight : 1],
         outputRange: [1, 0],
-        extrapolate: "clamp",
+        extrapolate: 'clamp',
       }),
-    [closedHeight, contentHeight, transitionY]
+    [closedHeight, contentHeight, transitionY],
   );
 
   return (
@@ -203,8 +203,7 @@ const Backdrop = ({
             opacity: clampedOpacity,
           },
         ]}
-        pointerEvents={visible ? "auto" : "none"}
-      >
+        pointerEvents={visible ? 'auto' : 'none'}>
         <TouchableOpacity
           style={styles.overlayTouchable}
           onPress={_handleClose}
@@ -224,13 +223,11 @@ const Backdrop = ({
             ],
             opacity: contentHeight ? 1 : 0,
           },
-        ]}
-      >
+        ]}>
         <View
           style={containerStyle}
           onLayout={onLayout}
-          {..._panResponder.panHandlers}
-        >
+          {..._panResponder.panHandlers}>
           {header}
           {children}
         </View>
