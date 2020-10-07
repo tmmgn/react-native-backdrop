@@ -27,7 +27,7 @@ const App = () => {
   };
 
   return (
-    <Fragment>
+    <>
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <TouchableOpacity
           onPress={() => setVisible(true)}
@@ -63,7 +63,8 @@ const App = () => {
           <Text>Backdrop Content</Text>
         </View>
       </Backdrop>
-    );
+    </>
+  );
 }
 
 
