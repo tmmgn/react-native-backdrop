@@ -67,18 +67,12 @@ const Backdrop = ({
     };
   }, [closeOnBackButton, onBackButtonPress]);
 
-  const swipeConfigConcated = useMemo(
-    () => ({...swipeConfigDefault, ...swipeConfig}),
-    [swipeConfig],
-  );
+  const swipeConfigConcated = {...swipeConfigDefault, ...swipeConfig};
 
-  const animationConfigConcated = useMemo(
-    () => ({
+  const animationConfigConcated = {
       ...animationConfigDefault,
       ...animationConfig,
-    }),
-    [animationConfig],
-  );
+    };
 
   const animationStart = useCallback(() => {
     Animated.spring(transitionY, {
@@ -100,20 +94,17 @@ const Backdrop = ({
     animationConfigConcated,
   ]);
 
-  const onLayout = useCallback(
-    (event) => {
+  const onLayout = (event) => {
       if (!contentHeight || !visible) {
         transitionY.setValue(event.nativeEvent.layout.height - closedHeight);
         setHeight(event.nativeEvent.layout.height);
       }
-    },
-    [contentHeight, closedHeight, transitionY, visible],
-  );
+  };
 
-  const onBackButtonPress = useCallback(() => {
+  const onBackButtonPress = () => {
     _handleClose();
     return true;
-  }, [_handleClose]);
+  });
 
   const _panResponder = PanResponder.create({
     onStartShouldSetPanResponder: (evt) => true,
@@ -146,8 +137,7 @@ const Backdrop = ({
     },
   });
 
-  const _isValidVerticalSwipe = useCallback(
-    (gestureState) => {
+  const _isValidVerticalSwipe = (gestureState) => {
       const {vy, dx} = gestureState;
       const {
         velocityThreshold,
@@ -159,20 +149,18 @@ const Backdrop = ({
         dx,
         directionalOffsetThreshold,
       );
-    },
-    [swipeConfigConcated],
-  );
+  };
 
-  const _handleOpen = useCallback(() => {
+  const _handleOpen = () => {
     beforeOpen();
     animationStart();
     handleOpen();
-  }, [beforeOpen, handleOpen, animationStart]);
+  };
 
-  const _handleClose = useCallback(() => {
+  const _handleClose = () => {
     beforeClose();
     handleClose();
-  }, [beforeClose, handleClose]);
+  };
 
   const clampedTransition = useMemo(
     () =>
