@@ -51,7 +51,7 @@ const Backdrop = ({
   closeOnBackButton = false,
 }) => {
   const [contentHeight, setHeight] = useState(0);
-  const transitionY = useRef(new Animated.Value(height)).current;
+  const transitionY = useRef(new Animated.Value(height));
 
   useEffect(() => {
     visible ? animationStart() : animationEnd();
@@ -75,19 +75,18 @@ const Backdrop = ({
     };
 
   const animationStart = useCallback(() => {
-    Animated.spring(transitionY, {
+    Animated.spring(transitionY.current, {
       toValue: 0,
       ...animationConfigConcated,
     }).start(() => afterOpen());
-  }, [transitionY, afterOpen, animationConfigConcated]);
+  }, [afterOpen, animationConfigConcated]);
 
   const animationEnd = useCallback(() => {
-    Animated.spring(transitionY, {
+    Animated.spring(transitionY.current, {
       toValue: contentHeight - closedHeight,
       ...animationConfigConcated,
     }).start(() => afterClose());
   }, [
-    transitionY,
     contentHeight,
     closedHeight,
     afterClose,
@@ -96,7 +95,7 @@ const Backdrop = ({
 
   const onLayout = (event) => {
       if (!contentHeight || !visible) {
-        transitionY.setValue(event.nativeEvent.layout.height - closedHeight);
+        transitionY.current.setValue(event.nativeEvent.layout.height - closedHeight);
         setHeight(event.nativeEvent.layout.height);
       }
   };
@@ -110,12 +109,12 @@ const Backdrop = ({
     onStartShouldSetPanResponder: (evt) => true,
     onPanResponderMove: (e, gestureState) => {
       if (visible) {
-        Animated.event([null, {dy: transitionY}], {useNativeDriver: false})(
+        Animated.event([null, {dy: transitionY.current}], {useNativeDriver: false})(
           e,
           gestureState,
         );
       } else {
-        transitionY.setValue(gestureState.dy + contentHeight - closedHeight);
+        transitionY.current.setValue(gestureState.dy + contentHeight - closedHeight);
       }
     },
     onPanResponderRelease: (evt, gestureState) => {
@@ -164,7 +163,7 @@ const Backdrop = ({
 
   const clampedTransition = useMemo(
     () =>
-      transitionY.interpolate({
+      transitionY.current.interpolate({
         inputRange: [0, contentHeight ? contentHeight - closedHeight : 1],
         outputRange: [
           contentHeight > height ? contentHeight - height + closedHeight : 0,
@@ -172,22 +171,22 @@ const Backdrop = ({
         ],
         extrapolate: 'clamp',
       }),
-    [closedHeight, contentHeight, transitionY],
+    [closedHeight, contentHeight],
   );
 
   const clampedOpacity = useMemo(
     () =>
-      transitionY.interpolate({
+      transitionY.current.interpolate({
         inputRange: [0, contentHeight ? contentHeight - closedHeight : 1],
         outputRange: [1, 0],
         extrapolate: 'clamp',
       }),
-    [closedHeight, contentHeight, transitionY],
+    [closedHeight, contentHeight],
   );
 
   const clampedContentOpacity = useMemo(
     () =>
-      transitionY.interpolate({
+      transitionY.current.interpolate({
         inputRange: [
           0,
           contentHeight ? (contentHeight - closedHeight) / 1.1 : 0.95,
@@ -196,7 +195,7 @@ const Backdrop = ({
         outputRange: [1, 1, 0],
         extrapolate: 'clamp',
       }),
-    [closedHeight, contentHeight, transitionY],
+    [closedHeight, contentHeight],
   );
 
   return (
